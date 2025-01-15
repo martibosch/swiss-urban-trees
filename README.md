@@ -1,17 +1,9 @@
-<!-- prettier-ignore-start -->
-
+[![pre-commit.ci status](https://results.pre-commit.ci/badge/github/martibosch/swiss-urban-trees/main.svg)](https://results.pre-commit.ci/latest/github/martibosch/swiss-urban-trees/main)
 [![GitHub license](https://img.shields.io/github/license/martibosch/swiss-urban-trees.svg)](https://github.com/martibosch/swiss-urban-trees/blob/main/LICENSE)
-
-<!-- prettier-ignore-end -->
 
 # Swiss urban tree inventory
 
-Urban tree crown detection and species identification from aerial imagery in Switzerland using deep learning
-
-## Requirements
-
-- [mamba](https://github.com/mamba-org/mamba), which can be installed using conda or [mambaforge](https://github.com/conda-forge/miniforge#mambaforge) (see [the official installation instructions](https://github.com/mamba-org/mamba#installation))
-- [snakemake](https://snakemake.github.io), which can be installed using [conda or mamba](https://snakemake.readthedocs.io/en/stable/getting_started/installation.html)
+Urban tree crown detection and species identification from aerial imagery in Switzerland using deep learning.
 
 ## Instructions
 
@@ -32,30 +24,6 @@ mamba activate swiss-urban-trees
 ```bash
 snakemake -c1 register_ipykernel
 ```
-
-4. Create a git repository:
-
-```bash
-git init
-```
-
-5. Activate pre-commit for the git repository:
-
-```bash
-pre-commit install
-pre-commit install --hook-type commit-msg
-```
-
-6. Create the first commit:
-
-```bash
-git add .
-git commit -m "feat: initial commit"
-```
-
-7. Enjoy! :rocket:
-
-_Optional_: if you are using GitHub, you can set up [pre-commit.ci](https://pre-commit.ci) as a continuous integration service for pre-commit.
 
 ## Acknowledgments
 
