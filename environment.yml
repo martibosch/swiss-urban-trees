@@ -3,26 +3,38 @@ channels:
   - conda-forge
   - bioconda
 dependencies:
+  - contextily=1.6.2
   - detectree=0.6.0
   - direnv=2.35.0
   - geopandas=1.0.1
   - geopandas-base=1.0.1
   - iprogress=0.4
+  - libgdal=3.10.0
   - numpy=2.2.1
   - osmnx=2.0.0
   - owslib=0.31.0
   - pandas=2.2.3
+  - pdal=2.8.3
   - pip=24.3.1
   - pip:
       - -e .
       - deepforest==1.4.1
       - label-studio==1.15.0
       - label-studio-sdk==1.0.8
+      - pdal-plugins==1.6.2
+  - pooch=1.8.2
+  - pystac=1.11.0
+  - pystac-client=0.8.5
   - python=3.12.3
+  - python-pdal=3.4.5
   - pytorch=2.5.1
   - pytorch-lightning=2.5.0
-  - rasterio=1.3.10
+  - rasterio=1.4.3
+  - scikit-image=0.25.0
+  - scikit-learn=1.6.1
+  - scipy=1.15.1
   - seaborn=0.13.2
   - snakemake=8.12.0
   - torchvision=0.20.1
   - tqdm=4.66.4
+  - xarray=2025.1.1
