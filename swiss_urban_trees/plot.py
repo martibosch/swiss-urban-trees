@@ -20,6 +20,7 @@ def plot_annot_vs_pred(
     *,
     figwidth: float | None = None,
     figheight: float | None = None,
+    col_wrap: int | None = 3,
     pred_title: str = "predictions",
     legend: bool = True,
     plot_annot_kwargs: utils.KwargsDType = None,
@@ -35,6 +36,9 @@ def plot_annot_vs_pred(
         Path to the directory containing the tiles.
     figwidth, figheight : numeric, optional
         Figure width and height. If None, the matplotlib defaults are used.
+    col_wrap : int, default 3
+        Number of columns to wrap the plots at. Ignored if the provided value is greater
+        than the number of patch sizes.
     pred_title : str, default "predictions"
         Title for the predictions plots.
     legend : bool, default True
@@ -74,15 +78,6 @@ def plot_annot_vs_pred(
     else:
         _plot_pred_kwargs = plot_pred_kwargs.copy()
 
-    num_rows = len(img_filenames)
-    num_cols = len(patch_sizes) + 1
-    fig, axes = plt.subplots(
-        num_rows, num_cols, figsize=(figwidth * num_cols, figheight * num_rows)
-    )
-    # in case there is only one image
-    if num_rows == 1:
-        axes = np.array([axes])
-
     if legend:
         _plot_annot_kwargs["legend"] = _plot_annot_kwargs.pop("legend", False)
         _plot_pred_kwargs["legend"] = _plot_pred_kwargs.pop("legend", True)
@@ -90,25 +85,46 @@ def plot_annot_vs_pred(
             "legend_kwds", {"loc": "center right", "bbox_to_anchor": (1.5, 0.5)}
         )
 
-    for img_filename, ax_row in zip(img_filenames, axes):
+    num_cols = min(len(patch_sizes) + 1, col_wrap)
+    # num_rows = len(img_filenames)
+    num_plots = len(img_filenames) * (len(patch_sizes) + 1)
+    num_rows = num_plots // num_cols
+    if num_plots % num_cols > 0:
+        num_rows += 1
+
+    fig, axes = plt.subplots(
+        num_rows, num_cols, figsize=(figwidth * num_cols, figheight * num_rows)
+    )
+    # in case there is only one image
+    if num_rows == 1:
+        axes = np.array([axes])
+
+    num_rows_per_img = (len(patch_sizes) + 1) // num_cols
+    if (len(patch_sizes) + 1) % num_cols > 0:
+        num_rows_per_img += 1
+    i = 0
+    for img_filename in img_filenames:
         with rio.open(
             path.join(tile_dir, f"{path.splitext(img_filename)[0]}.tif")
         ) as src:
             _plot_img_and_gdf(
                 src,
                 annot_gdf[annot_gdf["image_path"] == img_filename],
-                ax_row[0],
+                axes.flat[i],
                 **_plot_annot_kwargs,
             )
             # ACHTUNG: `pred_df` was assigned the `.tif` image instead of the jpeg
             # TODO: how to handle this properly?
-            for (patch_size, patch_gdf), ax in zip(
+            for j, (patch_size, patch_gdf) in enumerate(
                 pred_gdf[
                     pred_gdf["image_path"] == f"{path.splitext(img_filename)[0]}.tif"
                 ].groupby("patch_size"),
-                ax_row[1:],
+                start=1,
             ):
-                _plot_img_and_gdf(src, patch_gdf, ax, **_plot_pred_kwargs)
+                _plot_img_and_gdf(src, patch_gdf, axes.flat[i + j], **_plot_pred_kwargs)
+            for k in range(j + 1, num_cols * num_rows_per_img):
+                axes.flat[i + k].axis("off")
+            i += num_cols * num_rows_per_img
 
     if legend:
         # ideally we could do something like
@@ -119,26 +135,26 @@ def plot_annot_vs_pred(
         # )
         # but we get no handles and labels for the legend, maybe related to
         # https://github.com/geopandas/geopandas/issues/660
-        row_indices = np.arange(len(axes))
-        # TODO: how to handle even number of rows?
-        middle_row = row_indices[len(row_indices) // 2]
-        # iterate first half of rows
-        for row_i in row_indices:
-            # the first axis of each row is the annotations, so no need to remove
-            if row_i == middle_row:
-                # in the middle row, leave the legend of the last axis
-                _axes = axes[row_i][1:-1]
-            else:
-                _axes = axes[row_i][1:]
-            for ax in _axes:
+        def remove_legend(ax):
+            try:
                 ax.get_legend().remove()
+            except AttributeError:
+                # do not raise error if there is no legend
+                pass
 
-    for title, ax in zip(
-        ["annotations"]
-        + [f"{pred_title} (patch size: {patch_size})" for patch_size in patch_sizes],
-        axes[0],
-    ):
-        ax.set_title(title)
+        i = 0
+        for img_filename in img_filenames:
+            remove_legend(axes.flat[i])
+            for j in range(1, len(patch_sizes)):
+                remove_legend(axes.flat[i + j])
+
+    # axis titles
+    i = 0
+    for img_filename in img_filenames:
+        axes.flat[i].set_title("annotations")
+        for j, patch_size in enumerate(patch_sizes, start=1):
+            axes.flat[i + j].set_title(f"{pred_title} (patch size: {patch_size})")
+        i += num_cols * num_rows_per_img
 
     return fig
 
