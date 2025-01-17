@@ -13,6 +13,20 @@ from rasterio import plot
 from swiss_urban_trees import utils
 
 
+def plot_img_and_gdf(src, gdf, *, ax=None, **plot_kwargs) -> plt.Axes:
+    """Small helper to plot an image and bounding box geo-data frame over it."""
+    if ax is None:
+        _, ax = plt.subplots()
+    plot.show(src, with_bounds=False, ax=ax)
+    left, right = ax.get_xlim()
+    bottom, top = ax.get_ylim()
+    gdf.assign(**{"geometry": gdf.boundary}).plot(ax=ax, **plot_kwargs)
+    ax.set_xlim(left, right)
+    ax.set_ylim(bottom, top)
+
+    return ax
+
+
 def plot_annot_vs_pred(
     annot_gdf: gpd.GeoDataFrame,
     pred_gdf: gpd.GeoDataFrame,
@@ -25,7 +39,7 @@ def plot_annot_vs_pred(
     legend: bool = True,
     plot_annot_kwargs: utils.KwargsDType = None,
     plot_pred_kwargs: utils.KwargsDType = None,
-):
+) -> plt.Figure:
     """Plot annotations and predictions side by side for each image.
 
     Parameters
@@ -52,16 +66,6 @@ def plot_annot_vs_pred(
     fig : matplotlib.figure.Figure
 
     """
-
-    # small helper to plot image and gdf
-    def _plot_img_and_gdf(src, gdf, ax, **plot_kwargs):
-        plot.show(src, with_bounds=False, ax=ax)
-        left, right = ax.get_xlim()
-        bottom, top = ax.get_ylim()
-        gdf.assign(**{"geometry": gdf.boundary}).plot(ax=ax, **plot_kwargs)
-        ax.set_xlim(left, right)
-        ax.set_ylim(bottom, top)
-
     img_filenames = annot_gdf["image_path"].unique()
     patch_sizes = pred_gdf["patch_size"].unique()
 
@@ -107,7 +111,7 @@ def plot_annot_vs_pred(
         with rio.open(
             path.join(tile_dir, f"{path.splitext(img_filename)[0]}.tif")
         ) as src:
-            _plot_img_and_gdf(
+            plot_img_and_gdf(
                 src,
                 annot_gdf[annot_gdf["image_path"] == img_filename],
                 axes.flat[i],
@@ -121,7 +125,7 @@ def plot_annot_vs_pred(
                 ].groupby("patch_size"),
                 start=1,
             ):
-                _plot_img_and_gdf(src, patch_gdf, axes.flat[i + j], **_plot_pred_kwargs)
+                plot_img_and_gdf(src, patch_gdf, axes.flat[i + j], **_plot_pred_kwargs)
             for k in range(j + 1, num_cols * num_rows_per_img):
                 axes.flat[i + k].axis("off")
             i += num_cols * num_rows_per_img
