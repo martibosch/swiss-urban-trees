@@ -5,7 +5,18 @@
 
 Urban tree crown detection and species identification from aerial imagery in Switzerland using deep learning.
 
-## Instructions
+![Example results of the crop model for different patch sizes](reports/figures/crop-model-patch-size.png)
+
+*This repository is a draft/work in process, expect many changes/updates soon*.
+
+## Example notebooks
+
+- [Train/test split](https://github.com/martibosch/swiss-urban-trees/blob/main/notebooks/train-test-split.ipynb): using image descriptors and potentially tree inventories to select initial training tiles.
+- [Train/fine-tune a model to predict tree crowns](https://github.com/martibosch/swiss-urban-trees/blob/main/notebooks/train-crown.ipynb): evaluate results of the [DeepForest](https://deepforest.readthedocs.io/en/latest) pre-trained model and fine-tune it with our annotations.
+- [Multi species model](https://github.com/martibosch/swiss-urban-trees/blob/main/notebooks/multi-species-model.ipynb): train a model to predict tree species from the detected crowns.
+- [LiDAR to tree crowns](https://github.com/martibosch/swiss-urban-trees/blob/main/notebooks/lidar-to-crown.ipynb): explore the use of LiDAR data to predict tree crowns/species to assist manual annotations or reduce the need for them.
+
+## Instructions to reproduce
 
 1. Create a conda environment:
 
