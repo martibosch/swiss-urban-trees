@@ -22,6 +22,7 @@ dependencies:
       - label-studio==1.15.0
       - label-studio-sdk==1.0.8
       - pdal-plugins==1.6.2
+  - papermill=2.6.0
   - pooch=1.8.2
   - pystac=1.11.0
   - pystac-client=0.8.5
