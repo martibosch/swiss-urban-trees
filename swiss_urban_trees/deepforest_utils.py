@@ -100,13 +100,9 @@ def retrain_model(
     """Retrain the model on the annotated data."""
 
     def save_annot_df(annot_df, dst_filepath):
-        """Update image paths and labels and save the annotated data frame."""
-        annot_df.assign(
-            **{
-                "image_path": annot_df["image_path"].str.replace(".jpeg", ".tif"),
-                # "label": annot_df["label"].str.capitalize(),
-            }
-        ).to_csv(dst_filepath)
+        """Save the annotated data frame."""
+        # we are just using a function to DRY any eventual required preprocessing
+        annot_df.to_csv(dst_filepath)
         return dst_filepath
 
     # configure training

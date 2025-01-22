@@ -16,6 +16,12 @@ from swiss_urban_trees import geo_utils, settings, utils
 # to show progress bar for pandas apply
 tqdm.pandas()
 
+FORMAT_TO_DRIVER_DICT = {
+    "image/tiff": "GTiff",
+    "image/png": "PNG",
+    "image/jpeg": "JPEG",
+}
+
 
 class WMSDownloader:
     """Download tiles from a WMS service."""
@@ -70,8 +76,9 @@ class WMSDownloader:
         self.max_size = max_size
         self.tile_size = self.res * self.max_size
         self.format = format
+        self.ext = format.split("/")[-1]
         self.base_meta = {
-            "driver": "GTiff",
+            "driver": FORMAT_TO_DRIVER_DICT[format],
             "dtype": "uint8",
             "nodata": nodata,
             "count": 3,
@@ -99,7 +106,7 @@ class WMSDownloader:
         """
         # using only one decimal place due to the WMS resolution of 0.2m
         return path.join(
-            self.dst_dir, f"{xmin:.1f}_{ymin:.1f}_{xmax:.1f}_{ymax:.1f}.tif"
+            self.dst_dir, f"{xmin:.1f}_{ymin:.1f}_{xmax:.1f}_{ymax:.1f}.{self.ext}"
         )
 
     def _dump_geo_tile(
