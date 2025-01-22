@@ -108,24 +108,22 @@ def plot_annot_vs_pred(
         num_rows_per_img += 1
     i = 0
     for img_filename in img_filenames:
-        with rio.open(
-            path.join(tile_dir, f"{path.splitext(img_filename)[0]}.tif")
-        ) as src:
+        with rio.open(path.join(tile_dir, img_filename)) as src:
             plot_img_and_gdf(
                 src,
                 annot_gdf[annot_gdf["image_path"] == img_filename],
-                axes.flat[i],
+                ax=axes.flat[i],
                 **_plot_annot_kwargs,
             )
             # ACHTUNG: `pred_df` was assigned the `.tif` image instead of the jpeg
             # TODO: how to handle this properly?
             for j, (patch_size, patch_gdf) in enumerate(
-                pred_gdf[
-                    pred_gdf["image_path"] == f"{path.splitext(img_filename)[0]}.tif"
-                ].groupby("patch_size"),
+                pred_gdf[pred_gdf["image_path"] == img_filename].groupby("patch_size"),
                 start=1,
             ):
-                plot_img_and_gdf(src, patch_gdf, axes.flat[i + j], **_plot_pred_kwargs)
+                plot_img_and_gdf(
+                    src, patch_gdf, ax=axes.flat[i + j], **_plot_pred_kwargs
+                )
             for k in range(j + 1, num_cols * num_rows_per_img):
                 axes.flat[i + k].axis("off")
             i += num_cols * num_rows_per_img

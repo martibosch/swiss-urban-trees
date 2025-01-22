@@ -41,6 +41,9 @@ SITG_LAYER_NAME = "22"  # orthophoto may 2019
 
 SITG_AOI = "Geneva, Switzerland"
 SITG_TILES_DIR = path.join(DATA_RAW_DIR, "sitg-orthophoto-2019-tiles")
+SITG_WMS_DOWNLOAD_RES = 0.1  # in meters
+SITG_WMS_DOWNLOAD_TILE_SIZE = 2500  # in pixels
+SITG_WMS_DOWNLOAD_FORMAT = "image/jpeg"
 
 
 rule download_sitg_tiles:
@@ -57,6 +60,9 @@ rule download_sitg_tiles:
         "papermill {input.notebook} {output.notebook}"
         " -p wms_url '{SITG_WMS_URL}'"
         " -p layer_name {SITG_LAYER_NAME}"
+        " -p res {SITG_WMS_DOWNLOAD_RES}"
+        " -p tile_size {SITG_WMS_DOWNLOAD_TILE_SIZE}"
+        " -p format {SITG_WMS_DOWNLOAD_FORMAT}"
         " -p aoi '{SITG_AOI}'"
         " -p dst_dir {SITG_TILES_DIR}"
         " -p dst_filepath {output.tiles}"
