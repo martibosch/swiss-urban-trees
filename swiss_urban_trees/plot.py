@@ -181,7 +181,7 @@ def metrics_barplot(
     """
     return sns.barplot(
         pd.melt(
-            metrics_df.reset_index(),
+            metrics_df,
             id_vars="patch_size",
             var_name="metric",
         ),
