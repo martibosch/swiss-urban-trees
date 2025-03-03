@@ -33,5 +33,8 @@ select = ["D", "E", "F", "I"]
 [tool.ruff.isort]
 known-first-party = ["swiss_urban_trees"]
 
+[tool.ruff.lint.per-file-ignores]
+"*.ipynb" = ["E402"]
+
 [tool.setuptools.packages.find]
 include = ["swiss_urban_trees", "swiss_urban_trees.*"]
