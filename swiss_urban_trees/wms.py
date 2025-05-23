@@ -180,6 +180,73 @@ class WMSDownloader:
         """Get a geo-data frame with the tiles covering the AOI."""
         return geo_utils.get_tile_gser(aoi, self.tile_size, self.tile_size, self.crs)
 
+    def download_tile_gser(
+        self,
+        tile_gser: gpd.GeoSeries,
+        *,
+        keep_existing: bool = True,
+        filepath_col: str = "tile_filepath",
+    ) -> gpd.GeoDataFrame:
+        """Download image tiles for given geo-series of tile extents.
+
+        Parameters
+        ----------
+        tile_gser : gpd.GeoSeries
+            Geo-series of tile extents
+        keep_existing : bool, default True
+            If True, tiles that already exist in the destination directory will not be
+            downloaded again.
+        filepath_col : str, default "tile_filepath"
+            Name of the column in the returned geo-data frame that will contain the
+            paths to the downloaded tiles.
+
+        Returns
+        -------
+        tile_gdf : geopandas.GeoDataFrame
+            Geo-data frame with the paths to the downloaded tiles and extent bounds.
+
+        """
+        num_tiles = len(tile_gser)
+        if tile_gser.empty:
+            self.print_func(
+                "No intersecting tiles found, returning empty GeoDataFrame."
+            )
+            return gpd.GeoDataFrame()
+        else:
+            self.print_func(f"Splitting the provided AOI into {num_tiles} tiles.")
+            tile_gdf = gpd.GeoDataFrame(
+                {
+                    filepath_col: tile_gser.bounds.apply(
+                        lambda row: self._tile_filepath(*row), axis=1
+                    )
+                },
+                geometry=tile_gser,
+            )
+
+            if keep_existing:
+                # filter tiles that already exist in the destination directory
+                tile_gser = tile_gser[~tile_gdf[filepath_col].apply(path.exists)]
+                num_skip_tiles = num_tiles - len(tile_gser.index)
+                if num_skip_tiles > 0:
+                    self.print_func(
+                        f"Skipping {num_skip_tiles} tiles that already exist in "
+                        f"{self.dst_dir}."
+                    )
+
+            # download tiles
+            if tile_gser.empty:
+                self.print_func("No tiles to download.")
+            else:
+                self.print_func(f"Downloading {len(tile_gser)} tiles...")
+                _ = list(
+                    tile_gser.bounds.progress_apply(
+                        lambda row: self._dump_geo_tile(*row),
+                        axis=1,
+                    )
+                )
+                self.print_func(f"Downloaded {len(tile_gser)} tiles at {self.dst_dir}.")
+            return tile_gdf
+
     def download_aoi(
         self,
         aoi: utils.AOIDType,
@@ -207,44 +274,7 @@ class WMSDownloader:
 
         """
         tile_gser = self.get_tile_gser(aoi)
-        num_tiles = len(tile_gser)
-        if tile_gser.empty:
-            self.print_func(
-                "No intersecting tiles found, returning empty GeoDataFrame."
-            )
-            return gpd.GeoDataFrame()
-        else:
-            self.print_func(f"Splitting the provided AOI into {num_tiles} tiles.")
-            tile_gdf = gpd.GeoDataFrame(
-                {
-                    "tile_filepath": tile_gser.bounds.apply(
-                        lambda row: self._tile_filepath(*row), axis=1
-                    )
-                },
-                geometry=tile_gser,
-            )
 
-            if keep_existing:
-                # filter tiles that already exist in the destination directory
-                tile_gser = tile_gser[~tile_gdf["tile_filepath"].apply(path.exists)]
-                num_skip_tiles = num_tiles - len(tile_gser.index)
-                if num_skip_tiles > 0:
-                    self.print_func(
-                        f"Skipping {num_skip_tiles} tiles that already exist in "
-                        f"{self.dst_dir}."
-                    )
-
-            # download tiles
-            if tile_gser.empty:
-                self.print_func("No tiles to download.")
-            else:
-                self.print_func(f"Downloading {len(tile_gser)} tiles...")
-                _ = list(
-                    tile_gser.bounds.progress_apply(
-                        lambda row: self._dump_geo_tile(*row),
-                        axis=1,
-                    )
-                )
-                self.print_func(f"Downloaded {len(tile_gser)} tiles at {self.dst_dir}.")
-
-        return tile_gdf
+        return self.download_tile_gser(
+            tile_gser, keep_existing=keep_existing, filepath_col=filepath_col
+        )
