@@ -9,6 +9,7 @@ dependencies:
   - geopandas=1.0.1
   - geopandas-base=1.0.1
   - iprogress=0.4
+  - ipywidgets=8.1.7
   - libgdal=3.10.0
   - numpy=2.2.1
   - osmnx=2.0.0
@@ -19,6 +20,7 @@ dependencies:
   - pip:
       - -e .
       - deepforest==1.4.1
+      - https://github.com/martibosch/deepforest-modal-app/archive/main.zip
       - label-studio==1.15.0
       - label-studio-sdk==1.0.8
       - pdal-plugins==1.6.2
