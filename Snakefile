@@ -54,7 +54,7 @@ rule download_sitg_tiles:
         notebook=path.join(
             NOTEBOOKS_OUTPUT_DIR,
             "wms-download-"
-            f"{SITG_LAYER_NAME}-{SITG_AOI.replace(', ' , '-').lower()}.ipynb",
+            f"{SITG_LAYER_NAME}-{SITG_AOI.replace(', ', '-').lower()}.ipynb",
         ),
     shell:
         "papermill {input.notebook} {output.notebook}"
