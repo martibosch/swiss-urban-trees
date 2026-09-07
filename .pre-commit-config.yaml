@@ -1,26 +1,26 @@
-default_stages: [commit]
+default_stages: [pre-commit]
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.5.0
+    rev: v6.0.0
     hooks:
       - id: trailing-whitespace
       - id: end-of-file-fixer
       - id: check-yaml
 
   - repo: https://github.com/commitizen-tools/commitizen
-    rev: v3.13.0
+    rev: v4.18.0
     hooks:
       - id: commitizen
 
   - repo: https://github.com/adrienverge/yamllint.git
-    rev: v1.33.0
+    rev: v1.38.0
     hooks:
       - id: yamllint
         args: ["-d relaxed"]
 
   - repo: https://github.com/executablebooks/mdformat
-    rev: 0.7.17 # Use the ref you want to point at
+    rev: 1.0.0 # Use the ref you want to point at
     hooks:
       - id: mdformat
         # Optionally add plugins
@@ -29,30 +29,30 @@ repos:
           - mdformat-black
 
   - repo: https://github.com/pappasam/toml-sort
-    rev: v0.24.2
+    rev: v0.24.4
     hooks:
       - id: toml-sort-fix
         args: ["--in-place"]
 
   - repo: https://github.com/asottile/pyupgrade
-    rev: v3.15.0
+    rev: v3.21.2
     hooks:
       - id: pyupgrade
 
-  - repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: v0.9.1
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.16.6
     hooks:
       - id: ruff
         args: [ --fix ]
       - id: ruff-format
 
   - repo: https://github.com/kynan/nbstripout
-    rev: 0.6.1
+    rev: 0.9.1
     hooks:
       - id: nbstripout
         args: ["--keep-output"]
 
   - repo: https://github.com/snakemake/snakefmt
-    rev: v0.8.5
+    rev: v2.0.3
     hooks:
       - id: snakefmt
