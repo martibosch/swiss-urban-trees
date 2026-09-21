@@ -10,10 +10,10 @@ from os import path
 import geopandas as gpd
 import pandas as pd
 import rasterio as rio
-from sklearn import model_selection
-
 from deepforest import evaluate as evaluate_iou
 from deepforest import main, utilities
+from sklearn import model_selection
+
 from swiss_urban_trees import utils
 
 DEFAULT_IOU_THRESHOLD = 0.4
