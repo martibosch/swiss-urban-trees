@@ -6,9 +6,9 @@ build-backend = "setuptools.build_meta"
 name = "swiss-urban-trees"
 version = "0.1.0"
 description = "Urban tree crown detection and species identification from aerial imagery in Switzerland using deep learning"
-authors = [{name = "Martí Bosch", email = "marti.bosch@epfl.ch"}]
+authors = [{ name = "Martí Bosch", email = "marti.bosch@epfl.ch" }]
 readme = "README.md"
-license = {text = "GPL-3.0-only"}
+license = { text = "GPL-3.0-only" }
 classifiers = [
   "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
   "Programming Language :: Python :: 3",
